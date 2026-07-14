@@ -63,7 +63,10 @@
     weekSold: document.getElementById("week-sold"),
     monthProfit: document.getElementById("month-profit"),
     monthSpent: document.getElementById("month-spent"),
-    monthSold: document.getElementById("month-sold")
+    monthSold: document.getElementById("month-sold"),
+    allProfit: document.getElementById("all-profit"),
+    allSpent: document.getElementById("all-spent"),
+    allSold: document.getElementById("all-sold")
   };
 
   // Current status filter: "All", "Listed", or "Sold".
@@ -178,6 +181,7 @@
     var listedValue = 0;
     var week = { profit: 0, spent: 0, sold: 0 };
     var month = { profit: 0, spent: 0, sold: 0 };
+    var all = { profit: 0, spent: 0, sold: 0 };
 
     items.forEach(function (item) {
       if (item.status === "Listed") {
@@ -187,10 +191,16 @@
       }
 
       if (item.status === "Sold") {
-        var soldDate = parseIsoDate(item.dateSold);
-        if (!soldDate) return;
         var profit = typeof item.profit === "number" ? item.profit : 0;
         var cost = typeof item.cost === "number" ? item.cost : 0;
+
+        // All-time totals count every sold item, regardless of sold date.
+        all.profit += profit;
+        all.spent += cost;
+        all.sold += 1;
+
+        var soldDate = parseIsoDate(item.dateSold);
+        if (!soldDate) return;
 
         if (soldDate >= monthStart) {
           month.profit += profit;
@@ -215,6 +225,10 @@
     setStat(dash.monthProfit, month.profit, true);
     dash.monthSpent.textContent = formatMoney(month.spent);
     dash.monthSold.textContent = String(month.sold);
+
+    setStat(dash.allProfit, all.profit, true);
+    dash.allSpent.textContent = formatMoney(all.spent);
+    dash.allSold.textContent = String(all.sold);
   }
 
   // Set a stat value, optionally applying profit/loss colour.

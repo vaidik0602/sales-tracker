@@ -252,6 +252,16 @@ input:focus {
   letter-spacing: 0.03em;
 }
 
+/* All-time panel is the headline figure — give it a subtle accent. */
+.period-panel-alltime {
+  border-color: var(--primary);
+  background: var(--badge-listed-bg);
+}
+
+.period-panel-alltime .period-title {
+  color: var(--primary);
+}
+
 .stat-grid {
   display: flex;
   margin: 0;
