@@ -49,6 +49,10 @@
 
   var itemList = document.getElementById("item-list");
   var emptyMessage = document.getElementById("empty-message");
+  var filterButtons = document.querySelectorAll(".filter-btn");
+
+  // Current status filter: "All", "Listed", or "Sold".
+  var activeFilter = "All";
 
   // ---- Helpers ---------------------------------------------------------------
 
@@ -98,20 +102,26 @@
   // ---- Rendering -------------------------------------------------------------
 
   function render() {
-    // Most recent first (by creation time).
-    var sorted = items.slice().sort(function (a, b) {
+    // Apply the active status filter, then sort most recent first.
+    var visible = items.filter(function (item) {
+      return activeFilter === "All" || item.status === activeFilter;
+    });
+    visible.sort(function (a, b) {
       return b.createdAt - a.createdAt;
     });
 
     itemList.textContent = "";
 
-    if (sorted.length === 0) {
+    if (visible.length === 0) {
       emptyMessage.hidden = false;
+      emptyMessage.textContent = items.length === 0
+        ? "No items yet. Add your first one above."
+        : "No " + activeFilter.toLowerCase() + " items.";
       return;
     }
     emptyMessage.hidden = true;
 
-    sorted.forEach(function (item) {
+    visible.forEach(function (item) {
       itemList.appendChild(buildItemRow(item));
     });
   }
@@ -375,6 +385,17 @@
   }
 
   // ---- Init ------------------------------------------------------------------
+
+  // Wire up the status filter buttons.
+  Array.prototype.forEach.call(filterButtons, function (btn) {
+    btn.addEventListener("click", function () {
+      activeFilter = btn.getAttribute("data-filter");
+      Array.prototype.forEach.call(filterButtons, function (b) {
+        b.classList.toggle("is-active", b === btn);
+      });
+      render();
+    });
+  });
 
   form.addEventListener("submit", handleSubmit);
   itemList.addEventListener("click", handleListClick);

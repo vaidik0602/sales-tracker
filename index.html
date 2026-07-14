@@ -52,7 +52,14 @@
 
     <!-- Items list -->
     <section class="card" aria-labelledby="list-heading">
-      <h2 id="list-heading">Items</h2>
+      <div class="list-header">
+        <h2 id="list-heading">Items</h2>
+        <div class="filter" role="group" aria-label="Filter items by status">
+          <button type="button" class="filter-btn is-active" data-filter="All">All</button>
+          <button type="button" class="filter-btn" data-filter="Listed">Listed</button>
+          <button type="button" class="filter-btn" data-filter="Sold">Sold</button>
+        </div>
+      </div>
       <ul id="item-list" class="item-list"></ul>
       <p id="empty-message" class="empty-message">No items yet. Add your first one above.</p>
     </section>
