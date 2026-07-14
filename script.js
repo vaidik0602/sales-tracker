@@ -69,6 +69,32 @@
   // Current status filter: "All", "Listed", or "Sold".
   var activeFilter = "All";
 
+  // Tab navigation.
+  var tabButtons = document.querySelectorAll(".tab");
+  var views = {
+    dashboard: document.getElementById("view-dashboard"),
+    add: document.getElementById("view-add"),
+    items: document.getElementById("view-items")
+  };
+
+  // Show one view and highlight its tab. Scrolls back to the top.
+  function switchTab(name) {
+    if (!views[name]) return;
+    Object.keys(views).forEach(function (key) {
+      views[key].classList.toggle("is-active", key === name);
+    });
+    Array.prototype.forEach.call(tabButtons, function (btn) {
+      var isActive = btn.getAttribute("data-tab") === name;
+      btn.classList.toggle("is-active", isActive);
+      if (isActive) {
+        btn.setAttribute("aria-current", "page");
+      } else {
+        btn.removeAttribute("aria-current");
+      }
+    });
+    window.scrollTo(0, 0);
+  }
+
   // ---- Helpers ---------------------------------------------------------------
 
   // Parse a currency-style input. Returns a finite number, or null if invalid.
@@ -123,10 +149,12 @@
     return undefined;
   }
 
-  // Format a number as a currency amount (no locale currency symbol assumptions).
+  // Format a number as a British pound amount, e.g. 12.5 -> "£12.50",
+  // -3 -> "-£3.00". Returns "—" for missing/invalid values.
   function formatMoney(num) {
     if (typeof num !== "number" || !isFinite(num)) return "—";
-    return num.toFixed(2);
+    var sign = num < 0 ? "-" : "";
+    return sign + "£" + Math.abs(num).toFixed(2);
   }
 
   function showFormError(message) {
@@ -307,7 +335,13 @@
     var amountField = document.createElement("div");
     amountField.className = "field";
     var amountLabel = document.createElement("label");
-    amountLabel.textContent = "Amount received";
+    amountLabel.textContent = "Amount received (£)";
+    var amountWrap = document.createElement("div");
+    amountWrap.className = "money-input";
+    var amountPrefix = document.createElement("span");
+    amountPrefix.className = "money-prefix";
+    amountPrefix.setAttribute("aria-hidden", "true");
+    amountPrefix.textContent = "£";
     var amountInput = document.createElement("input");
     amountInput.type = "number";
     amountInput.step = "0.01";
@@ -317,8 +351,10 @@
     amountInput.className = "sell-amount";
     amountLabel.setAttribute("for", "sell-amount-" + item.id);
     amountInput.id = "sell-amount-" + item.id;
+    amountWrap.appendChild(amountPrefix);
+    amountWrap.appendChild(amountInput);
     amountField.appendChild(amountLabel);
-    amountField.appendChild(amountInput);
+    amountField.appendChild(amountWrap);
 
     var dateField = document.createElement("div");
     dateField.className = "field";
@@ -431,6 +467,8 @@
     saveItems(items);
     render();
     resetForm();
+    // Land on the Items list so the saved item is visible.
+    switchTab("items");
   }
 
   // ---- List interactions (event delegation) ---------------------------------
@@ -469,8 +507,8 @@
     submitBtn.textContent = "Update item";
     cancelEditBtn.hidden = false;
     formHeading.textContent = "Edit item";
+    switchTab("add");
     descriptionInput.focus();
-    form.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   // Reset the top form back to "add" mode.
@@ -572,8 +610,18 @@
     });
   });
 
+  // Wire up the bottom tab bar.
+  Array.prototype.forEach.call(tabButtons, function (btn) {
+    btn.addEventListener("click", function () {
+      switchTab(btn.getAttribute("data-tab"));
+    });
+  });
+
   form.addEventListener("submit", handleSubmit);
-  cancelEditBtn.addEventListener("click", resetForm);
+  cancelEditBtn.addEventListener("click", function () {
+    resetForm();
+    switchTab("items");
+  });
   itemList.addEventListener("click", handleListClick);
   itemList.addEventListener("submit", handleListSubmit);
   render();

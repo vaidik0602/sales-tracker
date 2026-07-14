@@ -12,112 +12,140 @@
   </header>
 
   <main class="container">
-    <!-- Totals dashboard -->
-    <section class="card dashboard" aria-labelledby="dashboard-heading">
-      <h2 id="dashboard-heading">Dashboard</h2>
+    <!-- ===== Dashboard view ===== -->
+    <section id="view-dashboard" class="view is-active" aria-labelledby="dashboard-heading">
+      <div class="card dashboard">
+        <h2 id="dashboard-heading">Dashboard</h2>
 
-      <div class="summary-strip">
-        <div class="summary-stat">
-          <span class="summary-value" id="listed-count">0</span>
-          <span class="summary-label">Still listed</span>
-        </div>
-        <div class="summary-stat">
-          <span class="summary-value" id="listed-value">0.00</span>
-          <span class="summary-label">Listing value</span>
-        </div>
-      </div>
-
-      <div class="period-panels">
-        <div class="period-panel">
-          <h3 class="period-title">This week</h3>
-          <dl class="stat-grid">
-            <div class="stat">
-              <dt>Profit</dt>
-              <dd id="week-profit">0.00</dd>
-            </div>
-            <div class="stat">
-              <dt>Spent</dt>
-              <dd id="week-spent">0.00</dd>
-            </div>
-            <div class="stat">
-              <dt>Items sold</dt>
-              <dd id="week-sold">0</dd>
-            </div>
-          </dl>
+        <div class="summary-strip">
+          <div class="summary-stat">
+            <span class="summary-value" id="listed-count">0</span>
+            <span class="summary-label">Still listed</span>
+          </div>
+          <div class="summary-stat">
+            <span class="summary-value" id="listed-value">£0.00</span>
+            <span class="summary-label">Listing value</span>
+          </div>
         </div>
 
-        <div class="period-panel">
-          <h3 class="period-title">This month</h3>
-          <dl class="stat-grid">
-            <div class="stat">
-              <dt>Profit</dt>
-              <dd id="month-profit">0.00</dd>
-            </div>
-            <div class="stat">
-              <dt>Spent</dt>
-              <dd id="month-spent">0.00</dd>
-            </div>
-            <div class="stat">
-              <dt>Items sold</dt>
-              <dd id="month-sold">0</dd>
-            </div>
-          </dl>
+        <div class="period-panels">
+          <div class="period-panel">
+            <h3 class="period-title">This week</h3>
+            <dl class="stat-grid">
+              <div class="stat">
+                <dt>Profit</dt>
+                <dd id="week-profit">£0.00</dd>
+              </div>
+              <div class="stat">
+                <dt>Spent</dt>
+                <dd id="week-spent">£0.00</dd>
+              </div>
+              <div class="stat">
+                <dt>Sold</dt>
+                <dd id="week-sold">0</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="period-panel">
+            <h3 class="period-title">This month</h3>
+            <dl class="stat-grid">
+              <div class="stat">
+                <dt>Profit</dt>
+                <dd id="month-profit">£0.00</dd>
+              </div>
+              <div class="stat">
+                <dt>Spent</dt>
+                <dd id="month-spent">£0.00</dd>
+              </div>
+              <div class="stat">
+                <dt>Sold</dt>
+                <dd id="month-sold">0</dd>
+              </div>
+            </dl>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Add / edit item form -->
-    <section class="card" aria-labelledby="form-heading">
-      <h2 id="form-heading">Add item</h2>
-      <form id="item-form" novalidate>
-        <input type="hidden" id="item-id" />
+    <!-- ===== Add / edit view ===== -->
+    <section id="view-add" class="view" aria-labelledby="form-heading">
+      <div class="card">
+        <h2 id="form-heading">Add item</h2>
+        <form id="item-form" novalidate>
+          <input type="hidden" id="item-id" />
 
-        <div class="field">
-          <label for="description">Description</label>
-          <input type="text" id="description" name="description"
-                 placeholder="e.g. Blue denim jacket, size M" maxlength="120" required />
-        </div>
+          <div class="field">
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description"
+                   placeholder="e.g. Blue denim jacket, size M" maxlength="120" required />
+          </div>
 
-        <div class="field">
-          <label for="date-acquired">Date acquired</label>
-          <input type="date" id="date-acquired" name="dateAcquired" required />
-        </div>
+          <div class="field">
+            <label for="date-acquired">Date acquired</label>
+            <input type="date" id="date-acquired" name="dateAcquired" required />
+          </div>
 
-        <div class="field">
-          <label for="cost">Item cost</label>
-          <input type="number" id="cost" name="cost" inputmode="decimal"
-                 step="0.01" min="0" placeholder="0.00" required />
-        </div>
+          <div class="field">
+            <label for="cost">Item cost (£)</label>
+            <div class="money-input">
+              <span class="money-prefix" aria-hidden="true">£</span>
+              <input type="number" id="cost" name="cost" inputmode="decimal"
+                     step="0.01" min="0" placeholder="0.00" required />
+            </div>
+          </div>
 
-        <div class="field">
-          <label for="listing-price">Listing price</label>
-          <input type="number" id="listing-price" name="listingPrice" inputmode="decimal"
-                 step="0.01" min="0" placeholder="0.00" required />
-        </div>
+          <div class="field">
+            <label for="listing-price">Listing price (£)</label>
+            <div class="money-input">
+              <span class="money-prefix" aria-hidden="true">£</span>
+              <input type="number" id="listing-price" name="listingPrice" inputmode="decimal"
+                     step="0.01" min="0" placeholder="0.00" required />
+            </div>
+          </div>
 
-        <p id="form-error" class="error-message" role="alert" hidden></p>
+          <p id="form-error" class="error-message" role="alert" hidden></p>
 
-        <div class="form-actions">
-          <button type="submit" id="submit-btn" class="btn btn-primary">Save item</button>
-          <button type="button" id="cancel-edit-btn" class="btn btn-ghost" hidden>Cancel</button>
-        </div>
-      </form>
+          <div class="form-actions">
+            <button type="submit" id="submit-btn" class="btn btn-primary">Save item</button>
+            <button type="button" id="cancel-edit-btn" class="btn btn-ghost" hidden>Cancel</button>
+          </div>
+        </form>
+      </div>
     </section>
 
-    <!-- Items list -->
-    <section class="card" aria-labelledby="list-heading">
-      <div class="list-header">
-        <h2 id="list-heading">Items</h2>
-        <div class="filter" role="group" aria-label="Filter items by status">
-          <button type="button" class="filter-btn is-active" data-filter="All">All</button>
-          <button type="button" class="filter-btn" data-filter="Listed">Listed</button>
-          <button type="button" class="filter-btn" data-filter="Sold">Sold</button>
+    <!-- ===== Items view ===== -->
+    <section id="view-items" class="view" aria-labelledby="list-heading">
+      <div class="card">
+        <div class="list-header">
+          <h2 id="list-heading">Items</h2>
+          <div class="filter" role="group" aria-label="Filter items by status">
+            <button type="button" class="filter-btn is-active" data-filter="All">All</button>
+            <button type="button" class="filter-btn" data-filter="Listed">Listed</button>
+            <button type="button" class="filter-btn" data-filter="Sold">Sold</button>
+          </div>
         </div>
+        <ul id="item-list" class="item-list"></ul>
+        <p id="empty-message" class="empty-message">No items yet. Tap “Add” below to create your first one.</p>
       </div>
-      <ul id="item-list" class="item-list"></ul>
-      <p id="empty-message" class="empty-message">No items yet. Add your first one above.</p>
     </section>
   </main>
+
+  <!-- ===== Bottom tab bar ===== -->
+  <nav class="tab-bar" aria-label="Main navigation">
+    <button type="button" class="tab is-active" data-tab="dashboard" aria-current="page">
+      <span class="tab-icon" aria-hidden="true">📊</span>
+      <span class="tab-label">Dashboard</span>
+    </button>
+    <button type="button" class="tab" data-tab="add">
+      <span class="tab-icon" aria-hidden="true">＋</span>
+      <span class="tab-label">Add</span>
+    </button>
+    <button type="button" class="tab" data-tab="items">
+      <span class="tab-icon" aria-hidden="true">🏷️</span>
+      <span class="tab-label">Items</span>
+    </button>
+  </nav>
 
   <script src="script.js"></script>
 </body>
