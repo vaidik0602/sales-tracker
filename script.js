@@ -46,6 +46,9 @@
   var costInput = document.getElementById("cost");
   var listingPriceInput = document.getElementById("listing-price");
   var formError = document.getElementById("form-error");
+  var submitBtn = document.getElementById("submit-btn");
+  var cancelEditBtn = document.getElementById("cancel-edit-btn");
+  var formHeading = document.getElementById("form-heading");
 
   var itemList = document.getElementById("item-list");
   var emptyMessage = document.getElementById("empty-message");
@@ -181,6 +184,20 @@
       actions.appendChild(sellBtn);
     }
 
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "btn btn-small btn-ghost";
+    editBtn.setAttribute("data-action", "edit");
+    editBtn.textContent = "Edit";
+    actions.appendChild(editBtn);
+
+    var deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "btn btn-small btn-danger";
+    deleteBtn.setAttribute("data-action", "delete");
+    deleteBtn.textContent = "Delete";
+    actions.appendChild(deleteBtn);
+
     return actions;
   }
 
@@ -285,23 +302,39 @@
       return;
     }
 
-    var newItem = {
-      id: generateId(),
-      description: description,
-      dateAcquired: dateAcquired,
-      cost: cost,
-      listingPrice: listingPrice,
-      status: "Listed",
-      amountReceived: null,
-      dateSold: null,
-      profit: null,
-      createdAt: Date.now()
-    };
+    var editingId = idField.value;
+    if (editingId) {
+      // Update an existing item, preserving its status/sold data.
+      var existing = findItem(editingId);
+      if (existing) {
+        existing.description = description;
+        existing.dateAcquired = dateAcquired;
+        existing.cost = cost;
+        existing.listingPrice = listingPrice;
+        // If already sold, keep profit in sync with the new cost.
+        if (existing.status === "Sold" && typeof existing.amountReceived === "number") {
+          existing.profit = existing.amountReceived - cost;
+        }
+      }
+    } else {
+      var newItem = {
+        id: generateId(),
+        description: description,
+        dateAcquired: dateAcquired,
+        cost: cost,
+        listingPrice: listingPrice,
+        status: "Listed",
+        amountReceived: null,
+        dateSold: null,
+        profit: null,
+        createdAt: Date.now()
+      };
+      items.push(newItem);
+    }
 
-    items.push(newItem);
     saveItems(items);
     render();
-    form.reset();
+    resetForm();
   }
 
   // ---- List interactions (event delegation) ---------------------------------
@@ -320,7 +353,53 @@
       openSellForm(li, id);
     } else if (action === "cancel-sell") {
       render(); // re-render discards the inline form
+    } else if (action === "edit") {
+      startEdit(id);
+    } else if (action === "delete") {
+      deleteItem(id);
     }
+  }
+
+  // Load an item into the top form for editing.
+  function startEdit(id) {
+    var item = findItem(id);
+    if (!item) return;
+    clearFormError();
+    idField.value = item.id;
+    descriptionInput.value = item.description;
+    dateAcquiredInput.value = item.dateAcquired;
+    costInput.value = item.cost;
+    listingPriceInput.value = item.listingPrice;
+    submitBtn.textContent = "Update item";
+    cancelEditBtn.hidden = false;
+    formHeading.textContent = "Edit item";
+    descriptionInput.focus();
+    form.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  // Reset the top form back to "add" mode.
+  function resetForm() {
+    form.reset();
+    idField.value = "";
+    submitBtn.textContent = "Save item";
+    cancelEditBtn.hidden = true;
+    formHeading.textContent = "Add item";
+    clearFormError();
+  }
+
+  // Delete an item after confirmation.
+  function deleteItem(id) {
+    var item = findItem(id);
+    if (!item) return;
+    var ok = window.confirm("Delete \"" + item.description + "\"? This can't be undone.");
+    if (!ok) return;
+    items = items.filter(function (it) {
+      return it.id !== id;
+    });
+    saveItems(items);
+    // If we were editing this item, clear the form.
+    if (idField.value === id) resetForm();
+    render();
   }
 
   // Replace an item's action row with the inline sell form.
@@ -398,6 +477,7 @@
   });
 
   form.addEventListener("submit", handleSubmit);
+  cancelEditBtn.addEventListener("click", resetForm);
   itemList.addEventListener("click", handleListClick);
   itemList.addEventListener("submit", handleListSubmit);
   render();
