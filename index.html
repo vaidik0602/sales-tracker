@@ -12,6 +12,60 @@
   </header>
 
   <main class="container">
+    <!-- Totals dashboard -->
+    <section class="card dashboard" aria-labelledby="dashboard-heading">
+      <h2 id="dashboard-heading">Dashboard</h2>
+
+      <div class="summary-strip">
+        <div class="summary-stat">
+          <span class="summary-value" id="listed-count">0</span>
+          <span class="summary-label">Still listed</span>
+        </div>
+        <div class="summary-stat">
+          <span class="summary-value" id="listed-value">0.00</span>
+          <span class="summary-label">Listing value</span>
+        </div>
+      </div>
+
+      <div class="period-panels">
+        <div class="period-panel">
+          <h3 class="period-title">This week</h3>
+          <dl class="stat-grid">
+            <div class="stat">
+              <dt>Profit</dt>
+              <dd id="week-profit">0.00</dd>
+            </div>
+            <div class="stat">
+              <dt>Spent</dt>
+              <dd id="week-spent">0.00</dd>
+            </div>
+            <div class="stat">
+              <dt>Items sold</dt>
+              <dd id="week-sold">0</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="period-panel">
+          <h3 class="period-title">This month</h3>
+          <dl class="stat-grid">
+            <div class="stat">
+              <dt>Profit</dt>
+              <dd id="month-profit">0.00</dd>
+            </div>
+            <div class="stat">
+              <dt>Spent</dt>
+              <dd id="month-spent">0.00</dd>
+            </div>
+            <div class="stat">
+              <dt>Items sold</dt>
+              <dd id="month-sold">0</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
     <!-- Add / edit item form -->
     <section class="card" aria-labelledby="form-heading">
       <h2 id="form-heading">Add item</h2>

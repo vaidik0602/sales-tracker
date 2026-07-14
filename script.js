@@ -54,6 +54,18 @@
   var emptyMessage = document.getElementById("empty-message");
   var filterButtons = document.querySelectorAll(".filter-btn");
 
+  // Dashboard elements.
+  var dash = {
+    listedCount: document.getElementById("listed-count"),
+    listedValue: document.getElementById("listed-value"),
+    weekProfit: document.getElementById("week-profit"),
+    weekSpent: document.getElementById("week-spent"),
+    weekSold: document.getElementById("week-sold"),
+    monthProfit: document.getElementById("month-profit"),
+    monthSpent: document.getElementById("month-spent"),
+    monthSold: document.getElementById("month-sold")
+  };
+
   // Current status filter: "All", "Listed", or "Sold".
   var activeFilter = "All";
 
@@ -76,6 +88,31 @@
     var month = String(d.getMonth() + 1).padStart(2, "0");
     var day = String(d.getDate()).padStart(2, "0");
     return d.getFullYear() + "-" + month + "-" + day;
+  }
+
+  // Parse a YYYY-MM-DD string into a local Date at midnight. Null if invalid.
+  function parseIsoDate(str) {
+    if (typeof str !== "string") return null;
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str);
+    if (!m) return null;
+    var d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // Start of the current week (Monday, local midnight).
+  function startOfWeek() {
+    var d = new Date();
+    d.setHours(0, 0, 0, 0);
+    var day = d.getDay(); // 0 = Sunday ... 6 = Saturday
+    var diff = (day === 0 ? 6 : day - 1); // days since Monday
+    d.setDate(d.getDate() - diff);
+    return d;
+  }
+
+  // Start of the current month (local midnight).
+  function startOfMonth() {
+    var d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
   }
 
   // Find an item by id. Returns the item object or undefined.
@@ -104,7 +141,66 @@
 
   // ---- Rendering -------------------------------------------------------------
 
+  // Recompute and paint the totals dashboard.
+  function renderDashboard() {
+    var weekStart = startOfWeek();
+    var monthStart = startOfMonth();
+
+    var listedCount = 0;
+    var listedValue = 0;
+    var week = { profit: 0, spent: 0, sold: 0 };
+    var month = { profit: 0, spent: 0, sold: 0 };
+
+    items.forEach(function (item) {
+      if (item.status === "Listed") {
+        listedCount += 1;
+        if (typeof item.listingPrice === "number") listedValue += item.listingPrice;
+        return;
+      }
+
+      if (item.status === "Sold") {
+        var soldDate = parseIsoDate(item.dateSold);
+        if (!soldDate) return;
+        var profit = typeof item.profit === "number" ? item.profit : 0;
+        var cost = typeof item.cost === "number" ? item.cost : 0;
+
+        if (soldDate >= monthStart) {
+          month.profit += profit;
+          month.spent += cost;
+          month.sold += 1;
+        }
+        if (soldDate >= weekStart) {
+          week.profit += profit;
+          week.spent += cost;
+          week.sold += 1;
+        }
+      }
+    });
+
+    dash.listedCount.textContent = String(listedCount);
+    dash.listedValue.textContent = formatMoney(listedValue);
+
+    setStat(dash.weekProfit, week.profit, true);
+    dash.weekSpent.textContent = formatMoney(week.spent);
+    dash.weekSold.textContent = String(week.sold);
+
+    setStat(dash.monthProfit, month.profit, true);
+    dash.monthSpent.textContent = formatMoney(month.spent);
+    dash.monthSold.textContent = String(month.sold);
+  }
+
+  // Set a stat value, optionally applying profit/loss colour.
+  function setStat(el, value, colourByProfit) {
+    el.textContent = formatMoney(value);
+    if (colourByProfit) {
+      el.classList.toggle("profit-positive", value > 0);
+      el.classList.toggle("profit-negative", value < 0);
+    }
+  }
+
   function render() {
+    renderDashboard();
+
     // Apply the active status filter, then sort most recent first.
     var visible = items.filter(function (item) {
       return activeFilter === "All" || item.status === activeFilter;
